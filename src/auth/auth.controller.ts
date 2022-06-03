@@ -1,4 +1,4 @@
-import { BadRequestException, Body, ClassSerializerInterceptor, Controller, Get, NotFoundException, Post, Req, Res, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, ClassSerializerInterceptor, Controller, Get, NotFoundException, Post, Req, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import * as bcrypt from 'bcryptjs';
 import { RegisterDto } from './models/register.dto';
@@ -7,6 +7,9 @@ import { JwtService } from '@nestjs/jwt';
 import { Request, response, Response } from 'express';
 import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller()
@@ -19,14 +22,35 @@ export class AuthController {
 
 
     @Post('register')
-    async register(@Body() body: RegisterDto) {
+    @UseInterceptors(FileInterceptor('picture', {
+        storage: diskStorage({
+            destination: "./uploads",
+            filename(_, file, callback) {
+                const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join("");
+                return callback(null, `${randomName}${extname(file.originalname)}`);
+            }
+        })
+    }))
+    async register(
+        @Body() body: RegisterDto,
+        @UploadedFile() file: Express.Multer.File
+    ) {
         if (body.password !== body.confirmPassword) {
             throw new BadRequestException("Passwords do not match")
         }
         const hashed = await bcrypt.hash(body.password, 12);
         return this.userService.create({
             firstName: body.firstName,
-            password: hashed
+            lastName: body.lastName,
+            email: body.email,
+            phoneNo: body.phoneNo,
+            gender: body.gender,
+            address: body.address,
+            dateOfBirth: body.dateOfBirth,
+            identityNumber: body.identityNumber,
+            password: hashed,
+            picture: `http://localhost:8000/api/${file.path}`,
+            role: { id: 1 }
         });
     }
 
@@ -39,12 +63,12 @@ export class AuthController {
             throw new NotFoundException("User not found");
         } else {
 
-            // if(!await bcrypt.compare(body.password, user.password)){
-            //     throw new BadRequestException("Invalid Credentials");
-            // }
-            if (body.password !== user.password) {
+            if (!await bcrypt.compare(body.password, user.password)) {
                 throw new BadRequestException("Invalid Credentials");
             }
+            // if (body.password !== user.password) {
+            //     throw new BadRequestException("Invalid Credentials");
+            // }
 
             const jwtToken = await this.jwtservice.signAsync({ id: user.id });
             response.cookie("jwt", jwtToken, { httpOnly: true })

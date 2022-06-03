@@ -1,35 +1,40 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Put, UseGuards } from '@nestjs/common';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { Role } from 'src/role/role.decorator';
+import { Roles } from 'src/role/role.enum';
+import { UserUpdateDto } from './model/userupdate.dto';
 import { User } from './user.entity';
 import { UserService } from './user.service';
-import * as bcrypt from 'bcryptjs';
-import { UserCreateDTO } from './model/user.create.dto';
-import { UserUpdateDto } from './model/userupdate.dto';
 
-
+@UseGuards(AuthGuard)
 @Controller('users')
 export class UserController {
     constructor(private userService: UserService) { }
 
+    //admin only
     @Get()
+    @Role(Roles.Admin)
     async all(): Promise<User[]> {
         return this.userService.all();
     }
 
-    @Post()
-    async create(@Body() body: UserCreateDTO): Promise<User> {
-        const password = await bcrypt.hash('1234', 12);
 
-        return this.userService.create({
-            firstName: body.firstName,
-            lastName: body.lastName,
-            password
-        });
-    }
+    // @Post()
+    // async create(@Body() body: UserCreateDTO): Promise<User> {
+    //     const password = await bcrypt.hash('1234', 12);
+
+    //     return this.userService.create({
+    //         firstName: body.firstName,
+    //         lastName: body.lastName,
+    //         password
+    //     });
+    // }
+
 
     @Get(':id')
     async get(@Param('id') id: number) {
 
-        return this.userService.findOne({ id })
+        return this.userService.findOne({ id }, ["role"])
     }
 
     @Put(':id')

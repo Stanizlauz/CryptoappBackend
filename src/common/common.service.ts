@@ -5,9 +5,9 @@ import { Repository } from 'typeorm';
 export abstract class CommonService {
     protected constructor(
         protected readonly repository: Repository<any>
-    ){}
+    ) { }
 
-    async all(): Promise<any[]>{
+    async all(): Promise<any[]> {
         return this.repository.find();
     }
 
@@ -15,15 +15,15 @@ export abstract class CommonService {
         return this.repository.save(data);
     }
 
-    async findOne(condition: any): Promise<any> {
-        return this.repository.findOne(condition);
+    async findOne(condition: any, relations=[]): Promise<any> {
+        return this.repository.findOne(condition, {relations});
     }
 
-    async update(id:number, data): Promise<any>{
-        return this.repository.update(id,data);
+    async update(id: number, data: any): Promise<any> {
+        return this.repository.update(id, data);
     }
 
-    async delete(id): Promise<any>{
+    async delete(id: number): Promise<any> {
         return this.repository.delete(id);
     }
 }

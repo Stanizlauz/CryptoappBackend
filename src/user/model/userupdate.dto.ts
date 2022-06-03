@@ -5,4 +5,16 @@ export class UserUpdateDto {
     lastName?:string;
 
     email?: string;
+
+    phoneNo: string;
+
+    gender: string;
+
+    address: string;
+
+    dateOfBirth: Date;
+
+    picture: string;
+
+    identityNumber: string;
 }

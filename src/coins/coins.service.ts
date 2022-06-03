@@ -2,14 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CommonService } from 'src/common/common.service';
 import { Repository } from 'typeorm';
-import { Role } from './role.entity';
+import { Coin } from './coins.entity';
 
 @Injectable()
-export class RoleService extends CommonService {
+export class CoinsService extends CommonService {
     constructor(
-        @InjectRepository(Role) private readonly roleRepository:Repository<Role>
-    ){
-        super(roleRepository)
+        @InjectRepository(Coin) private readonly coinRepository: Repository<Coin>
+    ) {
+        super(coinRepository)
     }
-
 }

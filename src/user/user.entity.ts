@@ -20,6 +20,9 @@ export class User {
     phoneNo: string;
 
     @Column()
+    address: string;
+
+    @Column()
     gender: string;
 
     @Column()
@@ -28,7 +31,7 @@ export class User {
     @Column()
     picture: string;
 
-    @Column()
+    @Column({nullable: true})
     identityNumber: string;
 
     @Column()
