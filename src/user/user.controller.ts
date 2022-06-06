@@ -6,14 +6,14 @@ import { UserUpdateDto } from './model/userupdate.dto';
 import { User } from './user.entity';
 import { UserService } from './user.service';
 
-@UseGuards(AuthGuard)
+// @UseGuards(AuthGuard)
 @Controller('users')
 export class UserController {
     constructor(private userService: UserService) { }
 
     //admin only
     @Get()
-    @Role(Roles.Admin)
+    // @Role(Roles.Admin)
     async all(): Promise<User[]> {
         return this.userService.all();
     }

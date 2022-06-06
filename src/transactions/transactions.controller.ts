@@ -11,7 +11,7 @@ import { UpdateTransactionDTO } from './model/updateTransactionDto';
 import { Transactions } from './transaction.entity';
 import { TransactionsService } from './transactions.service';
 
-@UseGuards(AuthGuard)
+// @UseGuards(AuthGuard)
 @Controller('transactions')
 export class TransactionsController {
     constructor(
