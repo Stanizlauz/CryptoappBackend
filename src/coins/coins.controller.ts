@@ -1,7 +1,9 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { Coin } from './coins.entity';
 import { CoinsService } from './coins.service';
 
+@UseGuards(JwtAuthGuard)
 @Controller('coins')
 export class CoinsController {
     constructor(

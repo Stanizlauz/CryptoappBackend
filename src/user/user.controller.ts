@@ -13,7 +13,7 @@ export class UserController {
 
     //admin only
     @Get()
-    // @Role(Roles.Admin)
+    // //@Role(Roles.Admin)
     async all(): Promise<User[]> {
         return this.userService.all();
     }

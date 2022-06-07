@@ -10,14 +10,14 @@ import { AuthService } from './auth.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import { JwtAuthGuard } from './jwt-auth.guard';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller()
 export class AuthController {
     constructor(
         private userService: UserService,
-        private jwtservice: JwtService,
-        private authService: AuthService
+        private jwtservice: JwtService
     ) { }
 
 
@@ -58,7 +58,7 @@ export class AuthController {
     async login(
         @Body() body: LoginDTO,
         @Res({ passthrough: true }) response: Response) {
-        const user = await this.userService.findOne({ email: body.email });
+        const user = await this.userService.findOne({ email: body.email },["role"]);
         if (!user) {
             throw new NotFoundException("User not found");
         } else {
@@ -69,26 +69,35 @@ export class AuthController {
             // if (body.password !== user.password) {
             //     throw new BadRequestException("Invalid Credentials");
             // }
-
-            const jwtToken = await this.jwtservice.signAsync({ id: user.id });
+            const payload = { username: user.email, sub: user.id };
+            const jwtToken = await this.jwtservice.signAsync(payload);
             response.cookie("jwt", jwtToken, { httpOnly: true })
-            return user;
+            return {
+                role:user?.role?.name,
+                email:user?.email,
+                name: `${user?.firstName} ${user?.lastName}`,
+                access_token: jwtToken
+            };
         }
     }
 
-    @UseGuards(AuthGuard)
+    // @UseGuards(AuthGuard)
+    @UseGuards(JwtAuthGuard)
     @Get("user")
     async user(@Req() request: Request) {
-        const loggedInUser = await this.authService.loggedInUser(request);
-        return this.userService.findOne({ loggedInUser })
+        // const loggedInUser = await this.authService.loggedInUser(request);
+        // const usee= this.userService.findOne({ loggedInUser })
+        return request.user;
+        // return request.user;
+
     }
 
-    @UseGuards(AuthGuard)
-    @Post("logout")
-    async logout(@Res({ passthrough: true }) response: Response) {
-        response.clearCookie('jwt');
-        return {
-            message: "Success"
-        }
-    }
+    // @UseGuards(AuthGuard)
+    // @Post("logout")
+    // async logout(@Res({ passthrough: true }) response: Response) {
+    //     response.clearCookie('jwt');
+    //     return {
+    //         message: "Success"
+    //     }
+    // }
 }
