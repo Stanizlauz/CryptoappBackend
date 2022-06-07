@@ -1,4 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { Role } from 'src/role/role.decorator';
 import { Roles } from 'src/role/role.enum';
@@ -7,6 +8,7 @@ import { AdminwalletService } from './adminwallet.service';
 import { CreateAdminWalletDTO } from './model/createAdminWalletDto';
 import { UpdateAdminWalletDTO } from './model/updateAdminWalletDto';
 
+@ApiTags("Adminwallet")
 @UseGuards(JwtAuthGuard)
 //@Role(Roles.Admin)
 @Controller('adminwallet')

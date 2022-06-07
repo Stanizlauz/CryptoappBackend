@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
@@ -15,6 +16,7 @@ import { UpdateTransactionDTO } from './model/updateTransactionDto';
 import { Transactions } from './transaction.entity';
 import { TransactionsService } from './transactions.service';
 
+@ApiTags("Transactions")
 @UseGuards(JwtAuthGuard)
 @Controller('transactions')
 export class TransactionsController {
@@ -25,14 +27,14 @@ export class TransactionsController {
     ) { }
 
     @Get()
-    async all(): Promise<Transactions[]> {
-        return this.transactionService.all();
-    }
-
-    @Get("user/transaction")
-    async allTransactionsOneUser(@Req() request: Request): Promise<Transactions[]> {
+    async all(@Req() request: Request): Promise<Transactions[]> {
         const loggedInUser = request.user["id"];
-        return this.transactionService.customQuery(loggedInUser);
+        const user = await this.userService.findOne({ id: loggedInUser }, ["role"])
+        if (user?.role?.name === Roles.Admin) {
+            return this.transactionService.all();
+        } else {
+            return this.transactionService.customQuery(loggedInUser);
+        }
     }
 
 

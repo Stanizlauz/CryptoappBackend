@@ -11,7 +11,9 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags("Auth")
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller()
 export class AuthController {
