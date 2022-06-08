@@ -1,19 +1,22 @@
 import { Body, Controller, Delete, Get, Param, Put, UseGuards } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { Role } from 'src/role/role.decorator';
 import { Roles } from 'src/role/role.enum';
 import { UserUpdateDto } from './model/userupdate.dto';
 import { User } from './user.entity';
 import { UserService } from './user.service';
 
-// @UseGuards(AuthGuard)
+@ApiTags("Users")
+@UseGuards(JwtAuthGuard)
 @Controller('users')
 export class UserController {
     constructor(private userService: UserService) { }
 
     //admin only
     @Get()
-    // @Role(Roles.Admin)
+    // //@Role(Roles.Admin)
     async all(): Promise<User[]> {
         return this.userService.all();
     }

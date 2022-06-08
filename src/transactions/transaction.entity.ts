@@ -32,6 +32,9 @@ export class Transactions {
 
     @Column()
     userName: string;
+    
+    @Column()
+    picture: string;
 
     @Column()
     userId: string;

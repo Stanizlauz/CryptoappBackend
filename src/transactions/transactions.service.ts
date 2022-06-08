@@ -12,4 +12,10 @@ export class TransactionsService extends CommonService {
         super(transactionRepository)
     }
 
+    customQuery(idd: any): any {
+        return this.transactionRepository.createQueryBuilder("Transaction")
+            .where("Transaction.id =:id", { id: idd })
+            .getMany();
+    }
+
 }
