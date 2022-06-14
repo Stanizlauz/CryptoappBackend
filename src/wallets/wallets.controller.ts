@@ -3,6 +3,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { AuthService } from 'src/auth/auth.service';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { User } from 'src/user/user.entity';
 import { UserService } from 'src/user/user.service';
 import { CreateWalletDTO } from './model/createWalletDto';
@@ -11,7 +12,7 @@ import { Wallets } from './wallet.entity';
 import { WalletsService } from './wallets.service';
 
 @ApiTags("Wallets")
-@UseGuards(AuthGuard)
+@UseGuards(JwtAuthGuard)
 @Controller('wallets')
 export class WalletsController {
     constructor(
@@ -35,8 +36,8 @@ export class WalletsController {
         @Body() body: CreateWalletDTO,
         @Req() request: Request
     ): Promise<Wallets> {
-        const loggedInUser = await this.authService.loggedInUser(request);
-        const user:User = await this.userService.findOne( loggedInUser );
+        // const loggedInUser = await this.authService.loggedInUser(request);
+        const user:User = await this.userService.findOne( request.user["id"] );
         return this.walletService.create({
             coin: body.coin,
             walletAddress: body.walletAddress,

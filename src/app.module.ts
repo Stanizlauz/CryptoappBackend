@@ -16,9 +16,23 @@ import { TransactionsModule } from './transactions/transactions.module';
 import { RolesGuard } from './role/role.guard';
 import { CoinsModule } from './coins/coins.module';
 import { AdminwalletModule } from './adminwallet/adminwallet.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
-  imports: [UserModule, TypeOrmModule.forRoot(config), AuthModule, CommonModule, RoleModule, PermissionModule, WalletsModule, TransactionsModule, CoinsModule, AdminwalletModule],
+  imports: [ServeStaticModule.forRoot({
+    rootPath: join(__dirname, '../../../', 'frontend/build'),
+  }),
+    UserModule,
+  TypeOrmModule.forRoot(config),
+    AuthModule,
+    CommonModule,
+    RoleModule,
+    PermissionModule,
+    WalletsModule,
+    TransactionsModule,
+    CoinsModule,
+    AdminwalletModule],
   providers: [
     {
       provide: APP_GUARD,
@@ -26,4 +40,4 @@ import { AdminwalletModule } from './adminwallet/adminwallet.module';
     }
   ]
 })
-export class AppModule {}
+export class AppModule { }

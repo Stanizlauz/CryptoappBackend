@@ -95,7 +95,7 @@ export class TransactionsController {
     async approve(
         @Param("id") id: number
     ) {
-        await this.transactionService.update(id, { transactionStatus: "Approved" });
+        await this.transactionService.update(id, { transactionStatus: "Active" });
         return this.transactionService.findOne({ id });
     }
 
