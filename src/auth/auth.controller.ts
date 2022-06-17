@@ -51,7 +51,7 @@ export class AuthController {
             dateOfBirth: body.dateOfBirth,
             identityNumber: body.identityNumber,
             password: hashed,
-            picture: `http://localhost:8000/api/uploads/${file.filename}`,
+            picture: `https://nest-api-investment.herokuapp.com/api/uploads/${file.filename}`,
             role: { id: 2 }
         });
     }
