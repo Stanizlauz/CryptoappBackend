@@ -6,7 +6,7 @@ const config: PostgresConnectionOptions = {
 
   port: 5432,
   username: 'postgres',
-  password: 'rita20',
+  password: 'b0bb1ejhay',
 
   entities: [
     'dist/src/**/*.entity{.ts,.js}'
