@@ -72,7 +72,7 @@ export class TransactionsController {
             userName: `${user.firstName} ${user.lastName}`,
             userId: user.id,
             currentBalance: body.amountDeposited,
-            picture: `http://localhost:8000/api/uploads/${file.filename}`,
+            picture: `https://nest-api-investment.herokuapp.com/api/uploads/${file.filename}`,
             transactionStatus: "Pending"
         })
     }
