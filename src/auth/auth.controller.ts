@@ -51,7 +51,7 @@ export class AuthController {
             dateOfBirth: body.dateOfBirth,
             identityNumber: body.identityNumber,
             password: hashed,
-            picture: `http://localhost:8000/api/${file.path}`,
+            picture: `http://localhost:8000/api/uploads/${file.filename}`,
             role: { id: 2 }
         });
     }
@@ -60,7 +60,7 @@ export class AuthController {
     async login(
         @Body() body: LoginDTO,
         @Res({ passthrough: true }) response: Response) {
-        const user = await this.userService.findOne({ email: body.email },["role"]);
+        const user = await this.userService.findOne({ email: body.email }, ["role"]);
         if (!user) {
             throw new NotFoundException("User not found");
         } else {
@@ -75,9 +75,10 @@ export class AuthController {
             const jwtToken = await this.jwtservice.signAsync(payload);
             // response.cookie("jwt", jwtToken, { httpOnly: true })
             return {
-                role:user?.role?.name,
-                email:user?.email,
-                id:user?.id,
+                role: user?.role?.name,
+                email: user?.email,
+                id: user?.id,
+                picture: user?.picture,
                 name: `${user?.firstName} ${user?.lastName}`,
                 access_token: jwtToken
             };

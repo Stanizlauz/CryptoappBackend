@@ -11,4 +11,9 @@ export class WalletsService extends CommonService {
     ) {
         super(walletRepository)
     }
+    customQuery(idd: any): any {
+        return this.walletRepository.createQueryBuilder("Wallets")
+            .where("Wallets.userId =:id", { id: idd })
+            .getMany();
+    }
 }

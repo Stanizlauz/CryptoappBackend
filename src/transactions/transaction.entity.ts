@@ -24,8 +24,8 @@ export class Transactions {
     @CreateDateColumn()
     startDate: Date;
 
-    @Column({nullable: true})
-    endDate: Date;
+    // @Column({nullable: true})
+    // endDate: Date;
 
     @Column()
     userEmail: string;
