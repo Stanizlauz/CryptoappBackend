@@ -71,7 +71,8 @@ export class TransactionsController {
             userEmail: user.email,
             userName: `${user.firstName} ${user.lastName}`,
             userId: user.id,
-            picture: `http://localhost:8000/api/${file.path}`,
+            currentBalance: body.amountDeposited,
+            picture: `http://localhost:8000/api/uploads/${file.filename}`,
             transactionStatus: "Pending"
         })
     }
@@ -84,7 +85,7 @@ export class TransactionsController {
     ) {
         await this.transactionService.update(id, {
             expectedPayout: body.expectedPayout,
-            endDate: body.endDate,
+            // endDate: body.endDate,
             currentBalance: body.currentBalance
         });
         return this.transactionService.findOne({ id })
@@ -95,7 +96,7 @@ export class TransactionsController {
     async approve(
         @Param("id") id: number
     ) {
-        await this.transactionService.update(id, { transactionStatus: "Approved" });
+        await this.transactionService.update(id, { transactionStatus: "Active" });
         return this.transactionService.findOne({ id });
     }
 

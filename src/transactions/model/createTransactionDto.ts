@@ -7,6 +7,6 @@ export class CreateTransactionDTO{
     @IsNotEmpty()
     amountDeposited: string;
     
-    @IsNotEmpty()
+    // @IsNotEmpty()
     picture: string;
 }

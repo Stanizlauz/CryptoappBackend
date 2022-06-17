@@ -2,7 +2,8 @@ import { Controller, Get, Param, Post, Res, UploadedFile, UseInterceptors } from
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { diskStorage } from 'multer';
-import path, { extname } from 'path';
+import path, { extname, join } from 'path';
+import { Observable } from 'rxjs';
 
 @Controller()
 export class UploadfilesController {
@@ -17,8 +18,9 @@ export class UploadfilesController {
         })
     }))
     uploadFile(@UploadedFile() file: Express.Multer.File) {
+        console.log(`http://localhost:8000/api/${file.path}`)
         return {
-            url: `http://localhost:8000/api/${file.path}`
+            url: `http://localhost:8000/api/uploads/${file.filename}`
         }
     }
 
@@ -28,5 +30,7 @@ export class UploadfilesController {
         @Res() res: Response
     ) {
         res.sendFile(path, { root: "uploads" })
+        // console.log(res.sendFile('http://localhost:8000/api/uploads/' + path))
+        // res.sendFile('http://localhost:8000/api/uploads/' + path)
     }
 }
