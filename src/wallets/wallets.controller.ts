@@ -43,6 +43,7 @@ export class WalletsController {
         @Req() request: Request
     ): Promise<Wallets> {
         // const loggedInUser = await this.authService.loggedInUser(request);
+        console.log(request.user)
         const user: User = await this.userService.findOne(request.user["id"]);
         return this.walletService.create({
             coin: body.coin,
