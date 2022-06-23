@@ -18,13 +18,32 @@ import { CoinsModule } from './coins/coins.module';
 import { AdminwalletModule } from './adminwallet/adminwallet.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 
 @Module({
-  imports: [ServeStaticModule.forRoot({
-    rootPath: join(__dirname, '../../../', 'frontend/build'),
-  }),
+  imports: [
+    // MailerModule.forRoot({
+    //   transport: {
+    //     service: "gmail",
+    //     auth: {
+    //       user: "rhitanene@gmail.com", // generated ethereal user
+    //       pass: "yywfbkmdrymkqwlr", // generated ethereal password
+    //     },
+    //   },
+    //   template: {
+    //     dir: join(__dirname, 'sendemail'),
+    //     adapter: new HandlebarsAdapter(),
+    //     options: {
+    //       strict: true,
+    //     },
+    //   },
+    // }),
+    // ServeStaticModule.forRoot({
+    //   rootPath: join(__dirname, '../../../', 'frontend/build'),
+    // }),
     UserModule,
-  TypeOrmModule.forRoot(config),
+    TypeOrmModule.forRoot(config),
     AuthModule,
     CommonModule,
     RoleModule,
@@ -32,12 +51,13 @@ import { join } from 'path';
     WalletsModule,
     TransactionsModule,
     CoinsModule,
-    AdminwalletModule],
+    AdminwalletModule,
+  ],
   providers: [
     {
       provide: APP_GUARD,
       useClass: RolesGuard
     }
-  ]
+  ],
 })
 export class AppModule { }

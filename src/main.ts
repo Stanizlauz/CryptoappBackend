@@ -10,8 +10,8 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.use(cookieParser());
   app.enableCors({
-    // origin: "http://localhost:3000",
-    origin: "https://capitaltrade.netlify.app",
+    origin: "http://localhost:3000",
+    // origin: "https://capitaltrade.netlify.app",
     credentials: true
   });
   const config = new DocumentBuilder() 
