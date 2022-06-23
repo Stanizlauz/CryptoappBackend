@@ -41,15 +41,19 @@ export class WalletsController {
     async create(
         @Body() body: CreateWalletDTO,
         @Req() request: Request
-    ): Promise<Wallets> {
+    ) {
         // const loggedInUser = await this.authService.loggedInUser(request);
         console.log(request.user)
         const user: User = await this.userService.findOne(request.user["id"]);
-        return this.walletService.create({
-            coin: body.coin,
-            walletAddress: body.walletAddress,
-            userId: user.id
-        })
+        if (!user.identityNumber) {
+            return { message: "User not verified, add identity number" }
+        } else {
+            return this.walletService.create({
+                coin: body.coin,
+                walletAddress: body.walletAddress,
+                userId: user.id
+            })
+        }
     }
 
     @Put(":id")

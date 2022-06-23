@@ -61,20 +61,24 @@ export class TransactionsController {
         @Body() body: CreateTransactionDTO,
         @Req() request: Request,
         @UploadedFile() file: Express.Multer.File
-    ): Promise<Transactions> {
+    ) {
         const loggedInUser = request.user["id"];
-        const user = await this.userService.findOne(loggedInUser);
+        const user: User = await this.userService.findOne(loggedInUser);
         // const loggedInUser = await this.authService.loggedInUser(request);
-        return this.transactionService.create({
-            coin: body.coin,
-            amountDeposited: body.amountDeposited,
-            userEmail: user.email,
-            userName: `${user.firstName} ${user.lastName}`,
-            userId: user.id,
-            currentBalance: body.amountDeposited,
-            picture: `https://nest-api-investment.herokuapp.com/api/uploads/${file.filename}`,
-            transactionStatus: "Pending"
-        })
+        if (!user.identityNumber) {
+            return { message: "User not verified, add identity number" }
+        } else {
+            return this.transactionService.create({
+                coin: body.coin,
+                amountDeposited: body.amountDeposited,
+                userEmail: user.email,
+                userName: `${user.firstName} ${user.lastName}`,
+                userId: user.id,
+                currentBalance: body.amountDeposited,
+                picture: `https://nest-api-investment.herokuapp.com/api/uploads/${file.filename}`,
+                transactionStatus: "Pending"
+            })
+        }
     }
 
     @Put(":id")

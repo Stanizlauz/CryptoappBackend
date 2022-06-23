@@ -7,7 +7,7 @@ import { CommonService } from './common.service';
     imports: [
     JwtModule.register({
       secret: jwtConstants.secret,
-      signOptions: { expiresIn: '1d' },
+      signOptions: { expiresIn: '10s' },
     }),
     ],
     exports: [
