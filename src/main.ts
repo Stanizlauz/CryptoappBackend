@@ -14,7 +14,7 @@ async function bootstrap() {
     // origin: "https://capitaltrade.netlify.app",
     credentials: true
   });
-  const config = new DocumentBuilder()
+  const config = new DocumentBuilder() 
     .setTitle('Investments')
     .setDescription('Investment API')
     .setVersion('1.0')

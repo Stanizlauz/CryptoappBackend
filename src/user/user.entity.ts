@@ -31,12 +31,15 @@ export class User {
     @Column()
     picture: string;
 
-    @Column({nullable: true})
+    @Column({ nullable: true })
     identityNumber: string;
 
     @Column()
     @Exclude()
     password: string;
+
+    @Column({ default: false })
+    confirmedUser: boolean;
 
     @ManyToOne(() => Role)
     role: Role;

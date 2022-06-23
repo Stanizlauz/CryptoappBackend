@@ -1,17 +1,19 @@
-import { BadRequestException, Body, ClassSerializerInterceptor, Controller, Get, NotFoundException, Post, Req, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
-import { UserService } from 'src/user/user.service';
-import * as bcrypt from 'bcryptjs';
-import { RegisterDto } from './models/register.dto';
-import { LoginDTO } from './models/login.dto';
+import { BadRequestException, Body, ClassSerializerInterceptor, Controller, Get, NotFoundException, Param, Post, Req, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { Request, response, Response } from 'express';
-import { AuthGuard } from './auth.guard';
-import { AuthService } from './auth.service';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiTags } from '@nestjs/swagger';
+import * as bcrypt from 'bcryptjs';
+import { Request, Response } from 'express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import { confirmEmailLink } from 'src/sendemail/confirmEmailLink';
+import { sendEmail } from 'src/sendemail/sendEmail';
+import { User } from 'src/user/user.entity';
+import { UserService } from 'src/user/user.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
-import { ApiTags } from '@nestjs/swagger';
+import { ChangePasswordDTO } from './models/changePassword.dto';
+import { LoginDTO } from './models/login.dto';
+import { RegisterDto } from './models/register.dto';
 
 @ApiTags("Auth")
 @UseInterceptors(ClassSerializerInterceptor)
@@ -41,7 +43,20 @@ export class AuthController {
             throw new BadRequestException("Passwords do not match")
         }
         const hashed = await bcrypt.hash(body.password, 12);
-        return this.userService.create({
+        // return this.userService.create({
+        //     firstName: body.firstName,
+        //     lastName: body.lastName,
+        //     email: body.email,
+        //     phoneNo: body.phoneNo,
+        //     gender: body.gender,
+        //     address: body.address,
+        //     dateOfBirth: body.dateOfBirth,
+        //     identityNumber: body.identityNumber,
+        //     password: hashed,
+        //     picture: `https://nest-api-investment.herokuapp.com/api/uploads/${file.filename}`,
+        //     role: { id: 2 }
+        // });
+        const creatUser: User = await this.userService.create({
             firstName: body.firstName,
             lastName: body.lastName,
             email: body.email,
@@ -54,23 +69,25 @@ export class AuthController {
             picture: `https://nest-api-investment.herokuapp.com/api/uploads/${file.filename}`,
             role: { id: 2 }
         });
+
+        sendEmail(body.email, creatUser.firstName, confirmEmailLink(creatUser.id))
+        return "Check mail to verify registration.";
     }
 
     @Post("login")
     async login(
         @Body() body: LoginDTO,
         @Res({ passthrough: true }) response: Response) {
-        const user = await this.userService.findOne({ email: body.email }, ["role"]);
+        const user: User = await this.userService.findOne({ email: body.email }, ["role"]);
         if (!user) {
-            throw new NotFoundException("User not found");
+            throw new NotFoundException("Invalid Credentials");
         } else {
 
             if (!await bcrypt.compare(body.password, user.password)) {
                 throw new BadRequestException("Invalid Credentials");
+            } else if (!user?.confirmedUser) {
+                throw new BadRequestException("Verify email");
             }
-            // if (body.password !== user.password) {
-            //     throw new BadRequestException("Invalid Credentials");
-            // }
             const payload = { username: user.email, sub: user.id };
             const jwtToken = await this.jwtservice.signAsync(payload);
             // response.cookie("jwt", jwtToken, { httpOnly: true })
@@ -80,8 +97,32 @@ export class AuthController {
                 id: user?.id,
                 picture: user?.picture,
                 name: `${user?.firstName} ${user?.lastName}`,
-                access_token: jwtToken
+                access_token: jwtToken,
+                message: "Login successful"
             };
+        }
+    }
+
+    @Post()
+    async changePassword(
+        @Body() body: ChangePasswordDTO,
+        @Req() request: Request
+    ) {
+        // const loggedInUser = await this.authService.loggedInUser(request);
+        const user: User = await this.userService.findOne(request.user["id"]);
+        if (!user) {
+            throw new NotFoundException("Invalid Credentials");
+        } else {
+
+            if (!await bcrypt.compare(body.oldPassword, user.password)) {
+                throw new BadRequestException("Invalid Credentials");
+            }
+            if (body.newPassword !== body.confirmNewPassword) {
+                throw new BadRequestException("Passwords do not match")
+            }
+            const hashed = await bcrypt.hash(body.newPassword, 12);
+            const updatePassword = await this.userService.update(user.id, { password: hashed })
+            return "Password updated successfully!"
         }
     }
 
@@ -89,13 +130,17 @@ export class AuthController {
     @UseGuards(JwtAuthGuard)
     @Get("user")
     async user(@Req() request: Request) {
-        // const loggedInUser = await this.authService.loggedInUser(request);
-        // const usee= this.userService.findOne({ loggedInUser })
+        // sendEmail("giatest134@yopmail.com", "Rita", `http:localhost:3000/user/confirm/3`)
         return request.user;
         // return request.user;
 
     }
-
+    @Post('user/confirm/:id')
+    async confirmEmail(@Param('id') id: string) {
+        const user: User = await this.userService.findOne(Number(id))
+        await this.userService.update(Number(id), { confirmedUser: true })
+        return "Confirmed"
+    }
     // @UseGuards(AuthGuard)
     // @Post("logout")
     // async logout(@Res({ passthrough: true }) response: Response) {
