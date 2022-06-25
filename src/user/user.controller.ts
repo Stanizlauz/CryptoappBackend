@@ -1,10 +1,9 @@
-import { Body, Controller, Delete, Get, Param, Put, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Put, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
-import { Response } from 'express';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { Role } from 'src/role/role.decorator';
-import { Roles } from 'src/role/role.enum';
 import { UserUpdateDto } from './model/userupdate.dto';
 import { User } from './user.entity';
 import { UserService } from './user.service';
@@ -41,11 +40,44 @@ export class UserController {
     }
 
     @Put(':id')
+    @UseInterceptors(FileInterceptor('picture', {
+        storage: diskStorage({
+            destination: "./uploads",
+            filename(_, file, callback) {
+                const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join("");
+                return callback(null, `${randomName}${extname(file.originalname)}`);
+            }
+        })
+    }))
     async update(@Param('id') id: number,
-        @Body() body: UserUpdateDto) {
-
-        await this.userService.update(id, body);
-        return this.userService.findOne({ successmessage: "Success" })
+        @Body() body: UserUpdateDto, @UploadedFile() file: Express.Multer.File) {
+        if (file?.filename) {
+            let proPic = `https://nest-api-investment.herokuapp.com/api/uploads/${file.filename}`
+            await this.userService.update(id, {
+                firstName: body?.firstName,
+                lastName: body?.lastName,
+                phoneNo: body?.phoneNo,
+                gender: body?.gender,
+                dateOfBirth: body?.dateOfBirth,
+                picture: proPic,
+                identityNumber: body?.identityNumber
+            });
+            return { successmessage: "Success" }
+        } else if (body?.identityNumber) {
+            await this.userService.update(id, {
+                identityNumber: body?.identityNumber
+            });
+            return { successmessage: "Success" }
+        }
+        await this.userService.update(id, {
+            firstName: body?.firstName,
+            lastName: body?.lastName,
+            phoneNo: body?.phoneNo,
+            gender: body?.gender,
+            dateOfBirth: body?.dateOfBirth,
+            identityNumber: body?.identityNumber
+        });
+        return { successmessage: "Success" }
     }
 
     @Delete(':id')

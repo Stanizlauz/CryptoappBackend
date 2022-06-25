@@ -43,19 +43,12 @@ export class AuthController {
             throw new BadRequestException("Passwords do not match")
         }
         const hashed = await bcrypt.hash(body.password, 12);
-        // return this.userService.create({
-        //     firstName: body.firstName,
-        //     lastName: body.lastName,
-        //     email: body.email,
-        //     phoneNo: body.phoneNo,
-        //     gender: body.gender,
-        //     address: body.address,
-        //     dateOfBirth: body.dateOfBirth,
-        //     identityNumber: body.identityNumber,
-        //     password: hashed,
-        //     picture: `https://nest-api-investment.herokuapp.com/api/uploads/${file.filename}`,
-        //     role: { id: 2 }
-        // });
+        let proPicture: string;
+        if (file?.filename) {
+            proPicture = `https://nest-api-investment.herokuapp.com/api/uploads/${file.filename}`
+        } else {
+            proPicture = ''
+        }
         const creatUser: User = await this.userService.create({
             firstName: body.firstName,
             lastName: body.lastName,
@@ -66,7 +59,7 @@ export class AuthController {
             dateOfBirth: body.dateOfBirth,
             identityNumber: body.identityNumber,
             password: hashed,
-            picture: `https://nest-api-investment.herokuapp.com/api/uploads/${file.filename}`,
+            picture: proPicture,
             role: { id: 2 }
         });
 
