@@ -1,3 +1,3 @@
 export const confirmEmailLink = (userId: number) => {
-    return `http:localhost:3000/user/confirm/${userId}`
+    return `https://www.arkstrades.com/user/confirm/${userId}`
 };

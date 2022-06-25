@@ -41,14 +41,20 @@ export class WalletsController {
     async create(
         @Body() body: CreateWalletDTO,
         @Req() request: Request
-    ): Promise<Wallets> {
+    ) {
         // const loggedInUser = await this.authService.loggedInUser(request);
+        console.log(request.user)
         const user: User = await this.userService.findOne(request.user["id"]);
-        return this.walletService.create({
-            coin: body.coin,
-            walletAddress: body.walletAddress,
-            userId: user.id
-        })
+        if (!user.identityNumber) {
+            return { errormessage: "User not verified, add identity number" }
+        } else {
+            return this.walletService.create({
+                coin: body.coin,
+                walletAddress: body.walletAddress,
+                userId: user.id,
+                successmessage: "Successfully created"
+            })
+        }
     }
 
     @Put(":id")
@@ -57,11 +63,13 @@ export class WalletsController {
         @Body() body: UpdateWalletDTO
     ) {
         await this.walletService.update(id, { walletAddress: body.walletAddress })
-        return this.walletService.findOne({ id });
+        await this.walletService.findOne({ id });
+        return { successmessage: "Successfully updated" }
     }
 
     @Delete(":id")
     async delete(@Param("id") id: number) {
-        return this.walletService.delete(id);
+        await this.walletService.delete(id);
+        return { successmessage: "Successfully deleted" }
     }
 }

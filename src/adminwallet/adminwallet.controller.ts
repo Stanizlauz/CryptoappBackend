@@ -30,10 +30,11 @@ export class AdminwalletController {
     @Post()
     async create(
         @Body() body: CreateAdminWalletDTO,
-    ): Promise<AdminWallets> {
+    ) {
         return this.adminWalletService.create({
             coin: body.coin,
             walletAddress: body.walletAddress,
+            successmessage: "Wallet successfully created"
         })
     }
 
@@ -43,11 +44,12 @@ export class AdminwalletController {
         @Body() body: UpdateAdminWalletDTO
     ) {
         await this.adminWalletService.update(id, { walletAddress: body.walletAddress })
-        return this.adminWalletService.findOne({ id });
+        return this.adminWalletService.findOne({ successmessage: "Wallet successfully updated" });
     }
 
     @Delete(":id")
     async delete(@Param("id") id: number) {
-        return this.adminWalletService.delete(id);
+        await this.adminWalletService.delete(id);
+        return { successmessage: "Wallet successfully deleted" }
     }
 }

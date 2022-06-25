@@ -43,19 +43,12 @@ export class AuthController {
             throw new BadRequestException("Passwords do not match")
         }
         const hashed = await bcrypt.hash(body.password, 12);
-        // return this.userService.create({
-        //     firstName: body.firstName,
-        //     lastName: body.lastName,
-        //     email: body.email,
-        //     phoneNo: body.phoneNo,
-        //     gender: body.gender,
-        //     address: body.address,
-        //     dateOfBirth: body.dateOfBirth,
-        //     identityNumber: body.identityNumber,
-        //     password: hashed,
-        //     picture: `https://nest-api-investment.herokuapp.com/api/uploads/${file.filename}`,
-        //     role: { id: 2 }
-        // });
+        let proPicture: string;
+        if (file?.filename) {
+            proPicture = `https://nest-api-investment.herokuapp.com/api/uploads/${file.filename}`
+        } else {
+            proPicture = ''
+        }
         const creatUser: User = await this.userService.create({
             firstName: body.firstName,
             lastName: body.lastName,
@@ -66,12 +59,12 @@ export class AuthController {
             dateOfBirth: body.dateOfBirth,
             identityNumber: body.identityNumber,
             password: hashed,
-            picture: `https://nest-api-investment.herokuapp.com/api/uploads/${file.filename}`,
+            picture: proPicture,
             role: { id: 2 }
         });
 
         sendEmail(body.email, creatUser.firstName, confirmEmailLink(creatUser.id))
-        return "Check mail to verify registration.";
+        return { successmessage: "Registration successful, check mail to verify registration." }
     }
 
     @Post("login")
@@ -80,13 +73,13 @@ export class AuthController {
         @Res({ passthrough: true }) response: Response) {
         const user: User = await this.userService.findOne({ email: body.email }, ["role"]);
         if (!user) {
-            throw new NotFoundException("Invalid Credentials");
+            return { errormessage: "Invalid Credentials" }
         } else {
 
             if (!await bcrypt.compare(body.password, user.password)) {
-                throw new BadRequestException("Invalid Credentials");
+                return { errormessage: "Invalid Credentials" }
             } else if (!user?.confirmedUser) {
-                throw new BadRequestException("Verify email");
+                return { errormessage: "Verify email" }
             }
             const payload = { username: user.email, sub: user.id };
             const jwtToken = await this.jwtservice.signAsync(payload);
@@ -98,31 +91,34 @@ export class AuthController {
                 picture: user?.picture,
                 name: `${user?.firstName} ${user?.lastName}`,
                 access_token: jwtToken,
-                message: "Login successful"
+                successmessage: "Login successful"
             };
         }
     }
 
-    @Post()
+    @UseGuards(JwtAuthGuard)
+    @Post("changepassword")
     async changePassword(
         @Body() body: ChangePasswordDTO,
         @Req() request: Request
     ) {
         // const loggedInUser = await this.authService.loggedInUser(request);
+        console.log(request.user)
         const user: User = await this.userService.findOne(request.user["id"]);
         if (!user) {
-            throw new NotFoundException("Invalid Credentials");
+            return { errormessage: "Invalid Credentials" }
         } else {
 
             if (!await bcrypt.compare(body.oldPassword, user.password)) {
-                throw new BadRequestException("Invalid Credentials");
+                return { errormessage: "Invalid Credentials" }
             }
             if (body.newPassword !== body.confirmNewPassword) {
-                throw new BadRequestException("Passwords do not match")
+                return { errormessage: "Passwords do not match" }
             }
             const hashed = await bcrypt.hash(body.newPassword, 12);
             const updatePassword = await this.userService.update(user.id, { password: hashed })
-            return "Password updated successfully!"
+            return { successmessage: "Password updated successfully!" }
+            // return user;
         }
     }
 

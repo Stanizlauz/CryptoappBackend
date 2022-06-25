@@ -9,8 +9,8 @@ export const sendEmail = async (email: string, name: string, id: string) => {
         // port: 587,
         // secure: false, // true for 465, false for other ports
         auth: {
-            user: "rhitanene@gmail.com", // generated ethereal user
-            pass: "yywfbkmdrymkqwlr", // generated ethereal password
+            user: "arkstrades.info@gmail.com", // generated ethereal user
+            pass: "yssgtaeqrcdjrnut", // generated ethereal password
         },
     });
 

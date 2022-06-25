@@ -28,7 +28,7 @@ export class User {
     @Column()
     dateOfBirth: Date;
 
-    @Column()
+    @Column({ nullable: true })
     picture: string;
 
     @Column({ nullable: true })
