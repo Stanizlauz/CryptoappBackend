@@ -45,7 +45,7 @@ export class UserController {
         @Body() body: UserUpdateDto) {
 
         await this.userService.update(id, body);
-        return this.userService.findOne({ id })
+        return this.userService.findOne({ successmessage: "Success" })
     }
 
     @Delete(':id')

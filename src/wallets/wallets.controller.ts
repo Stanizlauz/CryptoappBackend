@@ -46,12 +46,13 @@ export class WalletsController {
         console.log(request.user)
         const user: User = await this.userService.findOne(request.user["id"]);
         if (!user.identityNumber) {
-            return { message: "User not verified, add identity number" }
+            return { errormessage: "User not verified, add identity number" }
         } else {
             return this.walletService.create({
                 coin: body.coin,
                 walletAddress: body.walletAddress,
-                userId: user.id
+                userId: user.id,
+                successmessage: "Successfully created"
             })
         }
     }
@@ -62,11 +63,13 @@ export class WalletsController {
         @Body() body: UpdateWalletDTO
     ) {
         await this.walletService.update(id, { walletAddress: body.walletAddress })
-        return this.walletService.findOne({ id });
+        await this.walletService.findOne({ id });
+        return { successmessage: "Successfully updated" }
     }
 
     @Delete(":id")
     async delete(@Param("id") id: number) {
-        return this.walletService.delete(id);
+        await this.walletService.delete(id);
+        return { successmessage: "Successfully deleted" }
     }
 }

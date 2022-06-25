@@ -66,7 +66,7 @@ export class TransactionsController {
         const user: User = await this.userService.findOne(loggedInUser);
         // const loggedInUser = await this.authService.loggedInUser(request);
         if (!user.identityNumber) {
-            return { message: "User not verified, add identity number" }
+            return { errormessage: "User not verified, add identity number" }
         } else {
             return this.transactionService.create({
                 coin: body.coin,
@@ -76,7 +76,8 @@ export class TransactionsController {
                 userId: user.id,
                 currentBalance: body.amountDeposited,
                 picture: `https://nest-api-investment.herokuapp.com/api/uploads/${file.filename}`,
-                transactionStatus: "Pending"
+                transactionStatus: "Pending",
+                successmessage: "Success"
             })
         }
     }
@@ -92,7 +93,7 @@ export class TransactionsController {
             // endDate: body.endDate,
             currentBalance: body.currentBalance
         });
-        return this.transactionService.findOne({ id })
+        return this.transactionService.findOne({ successmessage: "Success" })
     }
 
     @Patch("approve/:id")
@@ -101,7 +102,7 @@ export class TransactionsController {
         @Param("id") id: number
     ) {
         await this.transactionService.update(id, { transactionStatus: "Active" });
-        return this.transactionService.findOne({ id });
+        return this.transactionService.findOne({ successmessage: "Successfully approved" });
     }
 
     @Patch("cancel/:id")

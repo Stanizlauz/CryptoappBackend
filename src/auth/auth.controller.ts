@@ -71,7 +71,7 @@ export class AuthController {
         });
 
         sendEmail(body.email, creatUser.firstName, confirmEmailLink(creatUser.id))
-        return { message: "Check mail to verify registration." }
+        return { successmessage: "Registration successful, check mail to verify registration." }
     }
 
     @Post("login")
@@ -80,13 +80,13 @@ export class AuthController {
         @Res({ passthrough: true }) response: Response) {
         const user: User = await this.userService.findOne({ email: body.email }, ["role"]);
         if (!user) {
-            return { message: "Invalid Credentials" }
+            return { errormessage: "Invalid Credentials" }
         } else {
 
             if (!await bcrypt.compare(body.password, user.password)) {
-                return { message: "Invalid Credentials" }
+                return { errormessage: "Invalid Credentials" }
             } else if (!user?.confirmedUser) {
-                return { message: "Verify email" }
+                return { errormessage: "Verify email" }
             }
             const payload = { username: user.email, sub: user.id };
             const jwtToken = await this.jwtservice.signAsync(payload);
@@ -98,7 +98,7 @@ export class AuthController {
                 picture: user?.picture,
                 name: `${user?.firstName} ${user?.lastName}`,
                 access_token: jwtToken,
-                message: "Login successful"
+                successmessage: "Login successful"
             };
         }
     }
@@ -113,18 +113,18 @@ export class AuthController {
         console.log(request.user)
         const user: User = await this.userService.findOne(request.user["id"]);
         if (!user) {
-            return { message: "Invalid Credentials" }
+            return { errormessage: "Invalid Credentials" }
         } else {
 
             if (!await bcrypt.compare(body.oldPassword, user.password)) {
-                return { message: "Invalid Credentials" }
+                return { errormessage: "Invalid Credentials" }
             }
             if (body.newPassword !== body.confirmNewPassword) {
-                return { message: "Passwords do not match" }
+                return { errormessage: "Passwords do not match" }
             }
             const hashed = await bcrypt.hash(body.newPassword, 12);
             const updatePassword = await this.userService.update(user.id, { password: hashed })
-            return { message: "Password updated successfully!" }
+            return { successmessage: "Password updated successfully!" }
             // return user;
         }
     }
