@@ -11,7 +11,7 @@ async function bootstrap() {
   app.use(cookieParser());
   app.enableCors({
     // origin: "http://localhost:3000",
-    origin: ["https://www.arkstrades.com", "https://capitaltrade.netlify.app", "http://localhost:3000"],
+    origin: ["https://www.arkstrades.com","https://arkstrades.com", "https://capitaltrade.netlify.app", "http://localhost:3000"],
     // origin: "https://capitaltrade.netlify.app",
     credentials: true
   });
