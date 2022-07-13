@@ -93,7 +93,7 @@ export class TransactionsController {
             // endDate: body.endDate,
             currentBalance: body.currentBalance
         });
-        return this.transactionService.findOne({ successmessage: "Success" })
+        return { successmessage: "Successfully updated" }
     }
 
     @Patch("approve/:id")
@@ -102,7 +102,7 @@ export class TransactionsController {
         @Param("id") id: number
     ) {
         await this.transactionService.update(id, { transactionStatus: "Active" });
-        return this.transactionService.findOne({ successmessage: "Successfully approved" });
+        return { successmessage: "Successfully Approved" }
     }
 
     @Patch("cancel/:id")
