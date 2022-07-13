@@ -44,7 +44,7 @@ export class AdminwalletController {
         @Body() body: UpdateAdminWalletDTO
     ) {
         await this.adminWalletService.update(id, { walletAddress: body.walletAddress })
-        return this.adminWalletService.findOne({ successmessage: "Wallet successfully updated" });
+        return { successmessage: "Wallet successfully updated" };
     }
 
     @Delete(":id")
