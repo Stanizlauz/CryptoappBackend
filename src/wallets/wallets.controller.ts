@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { AuthService } from 'src/auth/auth.service';
@@ -11,6 +11,7 @@ import { UpdateWalletDTO } from './model/updateWalletDto';
 import { Wallets } from './wallet.entity';
 import { WalletsService } from './wallets.service';
 
+@ApiBearerAuth()
 @ApiTags("Wallets")
 @UseGuards(JwtAuthGuard)
 @Controller('wallets')

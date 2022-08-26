@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Put, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
@@ -8,6 +8,7 @@ import { UserUpdateDto } from './model/userupdate.dto';
 import { User } from './user.entity';
 import { UserService } from './user.service';
 
+@ApiBearerAuth()
 @ApiTags("Users")
 @UseGuards(JwtAuthGuard)
 @Controller('users')

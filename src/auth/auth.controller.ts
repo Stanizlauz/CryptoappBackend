@@ -6,12 +6,13 @@ import * as bcrypt from 'bcryptjs';
 import { Request, Response } from 'express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
-import { confirmEmailLink } from 'src/sendemail/confirmEmailLink';
+import { confirmEmailLink, forgotPasswordLink } from 'src/sendemail/confirmEmailLink';
 import { sendEmail } from 'src/sendemail/sendEmail';
 import { User } from 'src/user/user.entity';
 import { UserService } from 'src/user/user.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { ChangePasswordDTO } from './models/changePassword.dto';
+import { ForgotPasswordDTO } from './models/forgotPassword.dto';
 import { LoginDTO } from './models/login.dto';
 import { RegisterDto } from './models/register.dto';
 
@@ -63,7 +64,7 @@ export class AuthController {
             role: { id: 2 }
         });
 
-        sendEmail(body.email, creatUser.firstName, confirmEmailLink(creatUser.id))
+        sendEmail(body.email, creatUser.firstName, confirmEmailLink(creatUser.id),"register")
         return { successmessage: "Registration successful, check mail to verify registration." }
     }
 
@@ -136,6 +137,35 @@ export class AuthController {
         const user: User = await this.userService.findOne(Number(id))
         await this.userService.update(Number(id), { confirmedUser: true })
         return "Confirmed"
+    }
+
+    @Post('user/forgotpassword/:email')
+    async forgotPasswordEmail(@Param('email') email: string) {
+        const user: User = await this.userService.findOne({ email: email })
+        if (!user) {
+            return { errormessage: "Account does not exist." }
+        }
+        sendEmail(email, user.firstName, forgotPasswordLink(user.id),"passwordreset")
+        return { successmessage: "Check mail for further instructions." }
+    }
+
+    @Post("forgotpassword/:id")
+    async forgotPassword(
+        @Body() body: ForgotPasswordDTO,
+        @Param('id') id: number
+    ) {
+        const user: User = await this.userService.findOne(id);
+        if (!user) {
+            return { errormessage: "Account does not exist." }
+        } else {
+            if (body.newPassword !== body.confirmNewPassword) {
+                return { errormessage: "Passwords do not match" }
+            }
+            const hashed = await bcrypt.hash(body.newPassword, 12);
+            await this.userService.update(user.id, { password: hashed })
+            return { successmessage: "Password successfully changed!" }
+            // return user;
+        }
     }
     // @UseGuards(AuthGuard)
     // @Post("logout")
