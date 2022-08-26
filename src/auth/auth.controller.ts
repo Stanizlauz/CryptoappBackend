@@ -12,7 +12,7 @@ import { User } from 'src/user/user.entity';
 import { UserService } from 'src/user/user.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { ChangePasswordDTO } from './models/changePassword.dto';
-import { ForgotPasswordDTO } from './models/forgotPassword.dto';
+import { ForgotPasswordDTO, ForgotPasswordEmailDTO } from './models/forgotPassword.dto';
 import { LoginDTO } from './models/login.dto';
 import { RegisterDto } from './models/register.dto';
 
@@ -64,7 +64,7 @@ export class AuthController {
             role: { id: 2 }
         });
 
-        sendEmail(body.email, creatUser.firstName, confirmEmailLink(creatUser.id),"register")
+        sendEmail(body.email, creatUser.firstName, confirmEmailLink(creatUser.id), "register")
         return { successmessage: "Registration successful, check mail to verify registration." }
     }
 
@@ -139,13 +139,13 @@ export class AuthController {
         return "Confirmed"
     }
 
-    @Post('user/forgotpassword/:email')
-    async forgotPasswordEmail(@Param('email') email: string) {
-        const user: User = await this.userService.findOne({ email: email })
+    @Post('user/forgotpassword')
+    async forgotPasswordEmail(@Body() body: ForgotPasswordEmailDTO,) {
+        const user: User = await this.userService.findOne({ email: body.email })
         if (!user) {
             return { errormessage: "Account does not exist." }
         }
-        sendEmail(email, user.firstName, forgotPasswordLink(user.id),"passwordreset")
+        sendEmail(body.email, user.firstName, forgotPasswordLink(user.id), "passwordreset")
         return { successmessage: "Check mail for further instructions." }
     }
 
