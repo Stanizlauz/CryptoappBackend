@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
@@ -16,6 +16,7 @@ import { UpdateTransactionDTO } from './model/updateTransactionDto';
 import { Transactions } from './transaction.entity';
 import { TransactionsService } from './transactions.service';
 
+@ApiBearerAuth()
 @ApiTags("Transactions")
 @UseGuards(JwtAuthGuard)
 @Controller('transactions')

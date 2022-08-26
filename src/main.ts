@@ -19,10 +19,16 @@ async function bootstrap() {
     .setTitle('Investments')
     .setDescription('Investment API')
     .setVersion('1.0')
+    .addBearerAuth()
     // .addTag('investments')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('api', app, document, {
+    swaggerOptions: {
+      tagsSorter: 'alpha',
+      operationsSorter: 'alpha',
+    },
+  });
   // await app.listen(8000);
   await app.listen(process.env.PORT || 8000);
 }

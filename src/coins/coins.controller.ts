@@ -1,9 +1,10 @@
 import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { Coin } from './coins.entity';
 import { CoinsService } from './coins.service';
 
+@ApiBearerAuth()
 @ApiTags("Coins")
 @UseGuards(JwtAuthGuard)
 @Controller('coins')

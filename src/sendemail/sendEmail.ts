@@ -1,6 +1,14 @@
 import * as nodemailer from 'nodemailer';
+import { join } from 'path';
+import { forgotPasswordHtml, verifyEmailHtml } from './verifyhtml';
 
-export const sendEmail = async (email: string, name: string, id: string) => {
+export const sendEmail = async (email: string, name: string, id: string, type: string) => {
+    let htmlText: string;
+    if (type === "register") {
+        htmlText = verifyEmailHtml(email, name, id)
+    } else {
+        htmlText = forgotPasswordHtml(email, name, id)
+    }
 
     // create reusable transporter object using the default SMTP transport
     let transporter = nodemailer.createTransport({
@@ -10,7 +18,7 @@ export const sendEmail = async (email: string, name: string, id: string) => {
         // secure: false, // true for 465, false for other ports
         auth: {
             user: "arkstrades.info@gmail.com", // generated ethereal user
-            pass: "yssgtaeqrcdjrnut", // generated ethereal password
+            pass: "figeduyckmluhyiy", // generated ethereal password
         },
     });
 
@@ -20,22 +28,12 @@ export const sendEmail = async (email: string, name: string, id: string) => {
         to: email, // list of receivers
         subject: "Verify your email", // Subject line
         text: `Hello ${name}`, // plain text body
-        html: `<div>
-        <b>Hello ${name},</b>
-        <br/><br/>
-        <p>Click on the button to verify your email.</p>
-        <button style=" background-color: #4169e1;
-        border: none;
-        color: white;
-        padding: 10px 10px;
-        text-align: center;
-        border-radius: 12px;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 16px;
-        margin: 4px 2px;
-        cursor: pointer;"><a href="${id}">Verify Email</a></button>
-        </div>`, // html body
+        attachments: [{
+            filename: 'logo1.png',
+            path: join(__dirname + '/logo1.png'),
+            cid: 'arkstrades'
+        }],
+        html: htmlText, // html body
     });
 
     console.log("Message sent: %s", info.messageId);
