@@ -7,3 +7,9 @@ export class ForgotPasswordDTO {
     @IsNotEmpty()
     confirmNewPassword: string;
 }
+
+export class ForgotPasswordEmailDTO {
+    @IsNotEmpty()
+    email: string;
+
+}
