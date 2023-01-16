@@ -30,7 +30,7 @@ export const sendEmail = async (email: string, name: string, id: string, type: s
         text: `Hello ${name}`, // plain text body
         attachments: [{
             filename: 'logo1.png',
-            path: join(__dirname + '/logo1.png'),
+            path: join('uploads/logo1.png'),
             cid: 'arkstrades'
         }],
         html: htmlText, // html body
