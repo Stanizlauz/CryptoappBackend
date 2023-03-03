@@ -18,7 +18,7 @@ const config: PostgresConnectionOptions = {
   cli: {
     migrationsDir: 'src/db/migrations'
   },
-  url: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
+  // url: process.env.DATABASE_URL,
+  // ssl: { rejectUnauthorized: false }
 }
 export default config;
